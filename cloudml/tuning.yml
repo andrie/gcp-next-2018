@@ -2,8 +2,8 @@ trainingInput:
   hyperparameters:
     goal: MAXIMIZE
     hyperparameterMetricTag: val_acc
-    maxTrials: 1
-    max_parallel_trials: 1
+    maxTrials: 25
+    max_parallel_trials: 3
     params:
       - parameterName: conv_1_filters
         type: DISCRETE

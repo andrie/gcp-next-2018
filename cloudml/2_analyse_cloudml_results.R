@@ -10,7 +10,6 @@ library(here)
 
 setwd(here("cloudml"))
 
-library(cloudml)
 library(dplyr)
 
 # Upload the data to storage bucket using storage browser
@@ -19,21 +18,23 @@ library(dplyr)
 # https://tensorflow.rstudio.com/tools/cloudml/articles/storage.html
 
 
-cloudml_train("walking_cloudml.R", collect = TRUE, config = "tuning.yml")
+id <- "cloudml_2018_07_25_033119663"
 
-trials <- job_trials() %>% 
+
+trials <- job_trials(id) %>% 
   as_tibble() %>% 
   select(-one_of("hyperparameters.data_dir"))
 trials
 View(trials)
 
-trials_clean <- job_trials() %>% 
+trials_clean <- job_trials(id) %>% 
   as_tibble() %>% 
-  select(-one_of("hyperparameters.data_dir"))
+  select(-one_of("hyperparameters.data_dir")) %>% 
   mutate_at(vars(starts_with("hyperParameters")), round, 2) %>% 
   rename_all(~sub("finalMetric.", "", .)) %>% 
   rename_all(~sub("hyperparameters.", "", .)) %>% 
   select(-c(trainingStep)) %>% 
+  select(trialId, everything()) %>% 
   arrange(desc(objectiveValue))
 
 trials_clean
@@ -43,8 +44,12 @@ trials_clean %>%
   ggplot(aes(x = trialId, y = objectiveValue)) +
   geom_point() +
   stat_smooth(method = "lm") +
-  theme_bw(20)
+  theme_bw(16) + 
+  xlab("Trial ID") +
+  ylab("Validation Accuracy")
 
-job_collect(trials = "best")
+job_collect(job = id, trials = "best")
 
-# cloudml_train("mnist_cnn_cloudml.R", collect = TRUE, config = "tuning_2.yml")
+
+cloudml::cloudml_deploy()
+cloudml_deploy("runs/cloudml_2018_07_25_033119663-06", name = "walking_01")

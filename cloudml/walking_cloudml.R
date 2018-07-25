@@ -21,29 +21,20 @@ FLAGS <- tfruns::flags(
   
   flag_numeric("mini_batch_size", 32),
   
-  flag_string("data_dir", "walking-data")
+  flag_string("data_dir", "gs://walking-data")
 )
 
 
 # Load the training data
 
-# data_dir <- gs_local_dir(FLAGS$data_dir)
-data_dir <- FLAGS$data_dir
+url_x <- "https://storage.googleapis.com/walking-data/x_walk.rds"
+url_y <- "https://storage.googleapis.com/walking-data/y_walk.rds"
 
-print(data_dir)
-print(file.exists(file.path(data_dir, "x_walk.rds")))
-print(file.exists(file.path(data_dir, "y_walk.rds")))
+rds_x <- download.file(url_x, destfile = "x_walk.rds", mode = "wb")
+rds_y <- download.file(url_y, destfile = "y_walk.rds", mode = "wb")
 
-
-data_dir <- gs_local_dir(FLAGS$data_dir)
-
-print(FLAGS$data_dir)
-print(data_dir)
-print(file.exists(file.path(data_dir, "x_walk.rds")))
-print(file.exists(file.path(data_dir, "y_walk.rds")))
-
-x_walk <- file.path(data_dir, "x_walk.rds") %>% readRDS()
-y_walk <- file.path(data_dir, "y_walk.rds") %>% readRDS()
+x_walk <- readRDS("x_walk.rds")
+y_walk <- readRDS("y_walk.rds")
 
 # Define the model
 
@@ -106,3 +97,9 @@ history <- model %>%
 # Evaluate
 model %>%
   evaluate(x_walk$test, y_walk$test, verbose = 0)
+
+# Export saved model
+
+save_dir <- "saved_models"
+if (!dir.exists(save_dir)) dir.create(save_dir)
+tensorflow::export_savedmodel(model, export_dir_base = save_dir)
