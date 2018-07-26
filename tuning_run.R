@@ -1,5 +1,6 @@
 library(tfruns)
 library(dplyr)
+setwd(here::here())
 
 # Combinations: 1,259712
 # Desired runs: 64

@@ -1,5 +1,6 @@
 library(tfruns)
 library(dplyr)
+setwd(here::here())
 training_run("walking_experiments.R")
 
 view_run()
@@ -7,12 +8,12 @@ view_run()
 ls_runs() %>% 
   as_tibble()
 
-ls_runs(eval_acc > 0.985, order = eval_acc) %>% 
+ls_runs(eval_acc > 0.95, order = eval_acc) %>% 
   as_tibble()
 
-ls_runs(eval_acc > 0.985, order = eval_acc) %>% 
+ls_runs(eval_acc > 0.95, order = eval_acc) %>% 
   as_tibble() %>% 
-  tail()
+  head()
 
 
 tfruns::training_run(

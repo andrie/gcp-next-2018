@@ -1,4 +1,5 @@
 library(keras)
+setwd(here::here())
 
 # Load the test data
 x_walk <- readRDS("data/x_walk.rds")
